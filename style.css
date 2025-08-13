@@ -1,0 +1,148 @@
+:root {
+  --cor-vinho-principal: #422a29;
+  --cor-vinho-hover: #5a3a39;
+  --cor-fundo: #f8f5f2;
+  --cor-texto-principal: #3d3d3d;
+  --cor-branco: #ffffff;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-principal);
+}
+
+#wrapper {
+  min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+#sidebar {
+  width: 260px;
+  background-color: var(--cor-vinho-principal);
+  color: var(--cor-branco);
+  transition: all 0.3s;
+}
+
+.sidebar-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  border: 2px solid var(--cor-branco);
+  padding: 10px 5px;
+}
+
+#sidebar .nav-link {
+  color: var(--cor-branco);
+  padding: 12px 15px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#sidebar .nav-link:hover {
+  background-color: var(--cor-vinho-hover);
+}
+
+#sidebar .nav-link.active {
+  background-color: #c83349; /* Um vermelho/vinho mais vibrante para o item ativo */
+  font-weight: bold;
+}
+
+#sidebar .nav-link i {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-login-admin {
+  background-color: transparent;
+  color: var(--cor-branco);
+  border: 1px solid var(--cor-branco);
+}
+.btn-login-admin:hover {
+  background-color: var(--cor-branco);
+  color: var(--cor-vinho-principal);
+}
+
+/* --- Conteúdo Principal --- */
+#main-content {
+  background-color: var(--cor-fundo);
+}
+
+.page-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--cor-vinho-principal);
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--cor-vinho-principal);
+  margin-bottom: 2rem;
+}
+
+/* --- Animação para troca de página --- */
+.page-content {
+  animation: fadeIn 0.4s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Estilo Customizado do Modal de Login --- */
+#loginModal .modal-content {
+  border-radius: 15px; /* Bordas mais arredondadas */
+  border: none;
+  overflow: hidden; /* Essencial para o cabeçalho não "vazar" */
+}
+
+.custom-modal-header {
+  background-color: var(--cor-vinho-principal);
+  color: var(--cor-branco);
+}
+
+.custom-modal-header i {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.custom-modal-header p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9em;
+}
+
+#loginModal .modal-footer {
+  border-top: none; /* Remove a linha que separa o rodapé */
+}
+
+/* Deixando os botões do rodapé mais balanceados */
+#loginModal .modal-footer button {
+    flex-grow: 1; /* Faz os botões ocuparem o espaço disponível */
+}
+
+/* --- Estilos para Sidebar Recolhível --- */
+
+/* Animação suave para a sidebar e para o conteúdo principal */
+#sidebar, #main-content {
+  transition: all 0.4s ease-in-out;
+}
+
+#wrapper.sidebar-collapsed #sidebar {
+  margin-left: -260px; /* Move a sidebar para fora da tela */
+}
+
+#wrapper.sidebar-collapsed #main-content {
+  /* Opcional: pode adicionar um padding ou margem se necessário quando recolhido */
+}
+
+.btn-toggle-sidebar {
+  border: 1px solid var(--cor-vinho-principal);
+  color: var(--cor-vinho-principal);
+}
+
+.btn-toggle-sidebar:hover {
+  background-color: var(--cor-vinho-principal);
+  color: var(--cor-branco);
+}
+
+/* Remove a borda do título de cada página, já que agora temos um cabeçalho central */
+.page-title {
+  border-bottom: none;
+  margin-bottom: 0 !important;
+}
