@@ -196,3 +196,12 @@ body {
     display: block;
   }
 }
+
+/* --- Estilo para Cards de Aviso --- */
+.card-aviso {
+  border-left: 5px solid var(--cor-vinho-principal);
+}
+
+.card-aviso .card-title {
+  color: var(--cor-vinho-principal);
+}

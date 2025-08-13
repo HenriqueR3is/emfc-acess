@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css" />
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -101,6 +103,58 @@
     </div>
   </div>
 </div>
+
+<div id="page-home" class="page-content">
+  <div class="card admin-only mb-4">
+    <div class="card-header fw-bold">
+      <i class="fas fa-plus-circle me-2"></i>Adicionar Nova Avaliação
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="titulo-prova" class="form-label">Título da Prova/Trabalho</label>
+        <input type="text" id="titulo-prova" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="data-prova" class="form-label">Data de Entrega</label>
+        <input type="date" id="data-prova" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="conteudo-prova" class="form-label">Conteúdo e Detalhes</label>
+        <textarea id="conteudo-prova" class="form-control" rows="3" placeholder="Ex: Capítulos 1 a 5 do livro, entregar em PDF..."></textarea>
+      </div>
+      <button id="add-prova-btn" class="btn btn-primary w-100">Adicionar</button>
+    </div>
+  </div>
+
+<div id="page-home" class="page-content">
+  <div class="card admin-only mb-4">
+    <div class="card-header fw-bold"><i class="fas fa-bullhorn me-2"></i>Adicionar Novo Aviso</div>
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="titulo-aviso" class="form-label">Título do Aviso</label>
+        <input type="text" id="titulo-aviso" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="conteudo-aviso" class="form-label">Descrição Completa</label>
+        <textarea id="conteudo-aviso" class="form-control" rows="4"></textarea>
+      </div>
+      <button id="add-aviso-btn" class="btn btn-primary w-100">Publicar Aviso</button>
+    </div>
+  </div>
+
+  <h2 class="page-title mb-3">Mural de Avisos</h2>
+  <div id="lista-avisos" class="mb-5"></div>
+  
+  <hr>
+
+  <h2 class="page-title mt-5 mb-3">Próximas Provas e Trabalhos</h2>
+  <div id="lista-provas"></div>
+</div>
+
+  <div id="lista-provas"></div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="script.js"></script>
