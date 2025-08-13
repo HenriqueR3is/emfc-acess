@@ -147,3 +147,71 @@ body {
   margin-bottom: 0 !important;
 }
 
+/* =================================================== */
+/* ESTILOS PARA TELAS PEQUENAS (CELULARES) - RESPONSIVO */
+/* =================================================== */
+
+/* Este é o "pulo do gato" para evitar o zoom indesejado.
+   Proíbe a rolagem horizontal na página inteira, fazendo com que
+   o navegador ignore a sidebar que está escondida fora da tela. */
+body {
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+
+  /* A sidebar agora começa fora da tela, à esquerda */
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    
+    /* DEFINIMOS UMA LARGURA FIXA E ADEQUADA PARA CELULAR */
+    width: 280px; 
+  }
+
+  /* Quando a sidebar estiver aberta, o wrapper principal não se move */
+  #main-content {
+    width: 100%;
+  }
+
+  /* A CLASSE MÁGICA PARA MOSTRAR A SIDEBAR NO CELULAR */
+  body.sidebar-mobile-open #sidebar {
+    transform: translateX(0); /* Move a sidebar para a posição 0 (visível) */
+    box-shadow: 5px 0px 15px rgba(0,0,0,0.2);
+  }
+
+  /* Quando a sidebar estiver aberta, o conteúdo principal não pode ser rolado */
+  body.sidebar-mobile-open {
+    overflow: hidden;
+  }
+  
+  /* Garante que o botão de menu sempre apareça no mobile */
+  .btn-toggle-sidebar {
+    display: block; 
+  }
+  
+  /* O comportamento antigo de recolher a sidebar não é mais necessário no mobile */
+  #wrapper.sidebar-collapsed #sidebar {
+    margin-left: 0;
+  }
+
+  /* Cria uma sobreposição escura no conteúdo quando o menu está aberto */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+  }
+
+  body.sidebar-mobile-open #sidebar-overlay {
+    display: block;
+  }
+}
