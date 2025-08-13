@@ -6,10 +6,16 @@
   --cor-branco: #ffffff;
 }
 
+html {
+  /* Define a base para a conversão. 100% = 16px (padrão) */
+  font-size: 100%;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--cor-fundo);
   color: var(--cor-texto-principal);
+  overflow-x: hidden; /* Evita scroll horizontal indesejado */
 }
 
 #wrapper {
@@ -18,7 +24,7 @@ body {
 
 /* --- Sidebar --- */
 #sidebar {
-  width: 260px;
+  width: 16.25rem; /* 260px */
   background-color: var(--cor-vinho-principal);
   color: var(--cor-branco);
   transition: all 0.3s;
@@ -27,15 +33,15 @@ body {
 .sidebar-title {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  border: 2px solid var(--cor-branco);
-  padding: 10px 5px;
+  border: 0.125rem solid var(--cor-branco); /* 2px */
+  padding: 0.625rem 0.3125rem; /* 10px 5px */
 }
 
 #sidebar .nav-link {
   color: var(--cor-branco);
-  padding: 12px 15px;
-  margin-bottom: 5px;
-  border-radius: 8px;
+  padding: 0.75rem 0.9375rem; /* 12px 15px */
+  margin-bottom: 0.3125rem; /* 5px */
+  border-radius: 0.5rem; /* 8px */
   transition: background-color 0.2s ease-in-out;
 }
 
@@ -44,95 +50,22 @@ body {
 }
 
 #sidebar .nav-link.active {
-  background-color: #c83349; /* Um vermelho/vinho mais vibrante para o item ativo */
+  background-color: #c83349;
   font-weight: bold;
-}
-
-#sidebar .nav-link i {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.btn-login-admin {
-  background-color: transparent;
-  color: var(--cor-branco);
-  border: 1px solid var(--cor-branco);
-}
-.btn-login-admin:hover {
-  background-color: var(--cor-branco);
-  color: var(--cor-vinho-principal);
 }
 
 /* --- Conteúdo Principal --- */
 #main-content {
   background-color: var(--cor-fundo);
-}
-
-.page-title {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  color: var(--cor-vinho-principal);
-  padding-bottom: 10px;
-  border-bottom: 3px solid var(--cor-vinho-principal);
-  margin-bottom: 2rem;
-}
-
-/* --- Animação para troca de página --- */
-.page-content {
-  animation: fadeIn 0.4s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Estilo Customizado do Modal de Login --- */
-#loginModal .modal-content {
-  border-radius: 15px; /* Bordas mais arredondadas */
-  border: none;
-  overflow: hidden; /* Essencial para o cabeçalho não "vazar" */
-}
-
-.custom-modal-header {
-  background-color: var(--cor-vinho-principal);
-  color: var(--cor-branco);
-}
-
-.custom-modal-header i {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.custom-modal-header p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9em;
-}
-
-#loginModal .modal-footer {
-  border-top: none; /* Remove a linha que separa o rodapé */
-}
-
-/* Deixando os botões do rodapé mais balanceados */
-#loginModal .modal-footer button {
-    flex-grow: 1; /* Faz os botões ocuparem o espaço disponível */
-}
-
-/* --- Estilos para Sidebar Recolhível --- */
-
-/* Animação suave para a sidebar e para o conteúdo principal */
-#sidebar, #main-content {
   transition: all 0.4s ease-in-out;
 }
 
-#wrapper.sidebar-collapsed #sidebar {
-  margin-left: -260px; /* Move a sidebar para fora da tela */
-}
-
-#wrapper.sidebar-collapsed #main-content {
-  /* Opcional: pode adicionar um padding ou margem se necessário quando recolhido */
+.main-header {
+  margin-bottom: 2rem; /* 32px */
 }
 
 .btn-toggle-sidebar {
-  border: 1px solid var(--cor-vinho-principal);
+  border: 1px solid var(--cor-vinho-principal); /* Bordas finas podem continuar em px */
   color: var(--cor-vinho-principal);
 }
 
@@ -141,26 +74,62 @@ body {
   color: var(--cor-branco);
 }
 
-/* Remove a borda do título de cada página, já que agora temos um cabeçalho central */
 .page-title {
-  border-bottom: none;
-  margin-bottom: 0 !important;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--cor-vinho-principal);
+  margin: 0;
+}
+
+/* --- Animação para troca de página --- */
+.page-content {
+  animation: fadeIn 0.4s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(0.625rem); } /* 10px */
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Estilo Customizado do Modal de Login --- */
+#loginModal .modal-content {
+  border-radius: 0.9375rem; /* 15px */
+  border: none;
+  overflow: hidden;
+}
+
+.custom-modal-header {
+  background-color: var(--cor-vinho-principal);
+  color: var(--cor-branco);
+  padding: 2.5rem; /* 40px */
+}
+
+.custom-modal-header p {
+  font-size: 0.9rem; /* ~14.4px */
+}
+
+#loginModal .modal-footer {
+  border-top: none;
+  padding: 1rem; /* 16px */
+}
+
+#loginModal .modal-footer button {
+    flex-grow: 1;
+}
+
+/* --- Estilos para Sidebar Recolhível (Desktop) --- */
+#sidebar {
+  transition: all 0.4s ease-in-out;
+}
+
+#wrapper.sidebar-collapsed #sidebar {
+  margin-left: -16.25rem; /* -260px, mesma largura da sidebar */
 }
 
 /* =================================================== */
 /* ESTILOS PARA TELAS PEQUENAS (CELULARES) - RESPONSIVO */
 /* =================================================== */
-
-/* Este é o "pulo do gato" para evitar o zoom indesejado.
-   Proíbe a rolagem horizontal na página inteira, fazendo com que
-   o navegador ignore a sidebar que está escondida fora da tela. */
-body {
-  overflow-x: hidden;
-}
-
 @media (max-width: 768px) {
-
-  /* A sidebar agora começa fora da tela, à esquerda */
   #sidebar {
     position: fixed;
     top: 0;
@@ -168,38 +137,22 @@ body {
     height: 100vh;
     z-index: 1000;
     transform: translateX(-100%);
-    
-    /* DEFINIMOS UMA LARGURA FIXA E ADEQUADA PARA CELULAR */
-    width: 280px; 
+    width: 17.5rem; /* 280px */
+    box-shadow: 0.3125rem 0rem 0.9375rem rgba(0,0,0,0.2); /* 5px 0px 15px */
   }
 
-  /* Quando a sidebar estiver aberta, o wrapper principal não se move */
-  #main-content {
-    width: 100%;
-  }
-
-  /* A CLASSE MÁGICA PARA MOSTRAR A SIDEBAR NO CELULAR */
   body.sidebar-mobile-open #sidebar {
-    transform: translateX(0); /* Move a sidebar para a posição 0 (visível) */
-    box-shadow: 5px 0px 15px rgba(0,0,0,0.2);
+    transform: translateX(0);
   }
 
-  /* Quando a sidebar estiver aberta, o conteúdo principal não pode ser rolado */
   body.sidebar-mobile-open {
     overflow: hidden;
   }
   
-  /* Garante que o botão de menu sempre apareça no mobile */
-  .btn-toggle-sidebar {
-    display: block; 
-  }
-  
-  /* O comportamento antigo de recolher a sidebar não é mais necessário no mobile */
   #wrapper.sidebar-collapsed #sidebar {
     margin-left: 0;
   }
 
-  /* Cria uma sobreposição escura no conteúdo quando o menu está aberto */
   #sidebar-overlay {
     display: none;
     position: fixed;
