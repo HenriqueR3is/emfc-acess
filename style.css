@@ -162,6 +162,39 @@ body.sidebar-mobile-open {
   color: var(--cor-vinho-principal);
 }
 
-#loginModal .modal-content, .custom-modal-header, #loginModal .modal-footer {
-  /* ... (estilos do modal permanecem os mesmos) ... */
+/* --- Estilo Customizado do Modal de Login --- */
+  #loginModal .modal-content {
+    border-radius: 0.9375rem; /* 15px */
+    border: none;
+  body.sidebar-mobile-open {
+    overflow: hidden;
+  }
+
+  .custom-modal-header {
+    background-color: var(--cor-vinho-principal);
+    color: var(--cor-branco);
+    padding: 2.5rem; /* 40px */
+  }
+
+  .custom-modal-header p {
+    font-size: 0.9rem; /* ~14.4px */
+  }
+
+  #loginModal .modal-footer {
+    border-top: none;
+    padding: 1rem; /* 16px */
+  }
+
+  #loginModal .modal-footer button {
+      flex-grow: 1;
+  }
+
+  /* --- Estilos para Sidebar Recolhível (Desktop) --- */
+  #sidebar {
+    transition: all 0.4s ease-in-out;
+  }
+
+  #wrapper.sidebar-collapsed #sidebar {
+    margin-left: -16.25rem; /* -260px, mesma largura da sidebar */
+  }
 }

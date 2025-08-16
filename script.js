@@ -19,6 +19,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  window.editarProva = function(id, tituloAtual, dataAtual, conteudoAtual) {
+    const novoTitulo = prompt("Editar Título da Avaliação:", tituloAtual);
+    if (novoTitulo === null) return; // Usuário cancelou
+
+    const novaData = prompt("Editar Data (AAAA-MM-DD):", dataAtual);
+    if (novaData === null) return; // Usuário cancelou
+
+    const novoConteudo = prompt("Editar Conteúdo:", conteudoAtual);
+    if (novoConteudo === null) return; // Usuário cancelou
+
+    if (novoTitulo && novaData) {
+      db.collection("provas").doc(id).update({
+        titulo: novoTitulo,
+        data: novaData,
+        conteudo: novoConteudo
+      });
+    }
+  }
+
   window.deletarAviso = function(id) {
     if (confirm("Tem certeza que deseja apagar este aviso?")) {
       db.collection("avisos").doc(id).delete();
@@ -159,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="card-header d-flex justify-content-between align-items-center bg-white">
             <h5 class="card-title mb-0">${prova.titulo}</h5>
             <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
+              <button class="btn btn-sm btn-outline-primary me-2" onclick="editarProva('${doc.id}', \`${prova.titulo}\`, \`${prova.data}\`, \`${prova.conteudo || ''}\`)"><i class="fas fa-pencil-alt"></i></button>
               <button class="btn btn-sm btn-outline-danger" onclick="deletarProva('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
             </div>
           </div>
