@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const cardHtml = `
         <div class="card shadow-sm mb-3">
-          <div class="card-header d-flex justify-content-between align-items-center bg-white">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">${prova.titulo}</h5>
             <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
               <button class="btn btn-sm btn-outline-primary me-2" onclick="editarProva('${doc.id}', \`${prova.titulo}\`, \`${prova.data}\`, \`${prova.conteudo || ''}\`)"><i class="fas fa-pencil-alt"></i></button>

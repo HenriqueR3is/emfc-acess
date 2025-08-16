@@ -1,6 +1,7 @@
 :root {
   --cor-vinho-principal: #422a29;
   --cor-vinho-hover: #5a3a39;
+  --cor-vinho-accent: #c83349;
   --cor-fundo: #f8f5f2;
   --cor-texto-principal: #3d3d3d;
   --cor-branco: #ffffff;
@@ -16,7 +17,6 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--cor-fundo);
   color: var(--cor-texto-principal);
-  /* Garante que nada vaze da tela */
   overflow-x: hidden;
 }
 
@@ -39,8 +39,8 @@ body {
   color: var(--cor-branco);
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
-  /* Começa escondida fora da tela */
   transform: translateX(-100%);
+  flex-shrink: 0;
 }
 
 body.sidebar-mobile-open #sidebar {
@@ -52,6 +52,7 @@ body.sidebar-mobile-open #sidebar {
   width: 100%;
   padding: 1.5rem;
   transition: margin-left 0.4s ease-in-out;
+  min-width: 0; /* Correção para Flexbox */
 }
 
 .main-header {
@@ -84,26 +85,22 @@ body.sidebar-mobile-open {
   overflow: hidden;
 }
 
+
 /* ============================================= */
 /* ESTILOS PARA TELAS MAIORES (DESKTOP)          */
 /* ============================================= */
 
 @media screen and (min-width: 769px) {
   #sidebar {
-    /* No desktop, a sidebar volta a ser parte do layout */
     position: static;
-    height: auto;
-    width: var(--sidebar-width-desktop);
     transform: translateX(0);
-    flex-shrink: 0;
+    width: var(--sidebar-width-desktop);
   }
 
-  /* O botão de menu do celular é escondido no desktop */
   #sidebar-toggle {
     display: none;
   }
 
-  /* O overlay não é necessário no desktop */
   #sidebar-overlay {
     display: none !important;
   }
@@ -112,13 +109,12 @@ body.sidebar-mobile-open {
     overflow: auto;
   }
 
-  /* Lógica para recolher no desktop */
   #wrapper.sidebar-collapsed #sidebar {
     margin-left: calc(-1 * var(--sidebar-width-desktop));
   }
 }
 
-/* --- COMPONENTES (Estilos que não mudam com o tamanho da tela) --- */
+/* --- COMPONENTES GERAIS --- */
 
 .sidebar-title {
   font-family: 'Cinzel', serif;
@@ -154,47 +150,98 @@ body.sidebar-mobile-open {
   color: var(--cor-vinho-principal);
 }
 
-.card-aviso {
-  border-left: 5px solid var(--cor-vinho-principal);
+
+/* ============================================= */
+/* ===== ESTILOS REFINADOS PARA OS CARDS =====   */
+/* ============================================= */
+.card {
+  background-color: transparent;
+  border: none;
+  box-shadow: none !important;
+  border-radius: 0;
 }
 
-.card-aviso .card-title {
+/* Estilo unificado para os cards de Prova e Aviso */
+.card-aviso, .card.shadow-sm {
+  border-left: 4px solid var(--cor-vinho-accent);
+  padding-left: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Nova fonte para os títulos dos cards */
+.card .card-title {
+  font-family: 'Playfair Display', serif;
   color: var(--cor-vinho-principal);
 }
 
+/* Nova fonte para a descrição dos cards */
+.card .card-text, .card .card-subtitle, .card small {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* --- CORREÇÃO DO ALINHAMENTO DOS ÍCONES --- */
+.card-header, .card-body > .d-flex {
+  align-items: flex-start !important; /* Alinha os itens no topo */
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.card-header .card-title {
+  flex-grow: 1; /* Faz o título ocupar todo o espaço disponível */
+}
+
+
 /* --- Estilo Customizado do Modal de Login --- */
-  #loginModal .modal-content {
-    border-radius: 0.9375rem; /* 15px */
-    border: none;
-  body.sidebar-mobile-open {
-    overflow: hidden;
-  }
+#loginModal .modal-content {
+  border-radius: 0.9375rem;
+  border: none;
+  overflow: hidden;
+}
+.custom-modal-header {
+  background-color: var(--cor-vinho-principal);
+  color: var(--cor-branco);
+  padding: 2.5rem;
+}
+.custom-modal-header p {
+  font-size: 0.9rem;
+}
+#loginModal .modal-footer {
+  border-top: none;
+  padding: 1rem;
+}
+#loginModal .modal-footer button {
+  flex-grow: 1;
+}
 
-  .custom-modal-header {
-    background-color: var(--cor-vinho-principal);
-    color: var(--cor-branco);
-    padding: 2.5rem; /* 40px */
-  }
+/* ============================================= */
+/* ===== REFINAMENTOS DE DESIGN (HOME) =====     */
+/* ============================================= */
 
-  .custom-modal-header p {
-    font-size: 0.9rem; /* ~14.4px */
-  }
+/* Adiciona a cor de destaque à linha de separação */
+hr {
+  border-top: 2px solid var(--cor-vinho-accent);
+  opacity: 0.5;
+}
 
-  #loginModal .modal-footer {
-    border-top: none;
-    padding: 1rem; /* 16px */
-  }
+/* Estilo para os cards de Provas (semelhante aos de Aviso) */
+.card.shadow-sm {
+  border-left: 4px solid var(--cor-vinho-accent);
+  padding-left: 1rem;
+}
 
-  #loginModal .modal-footer button {
-      flex-grow: 1;
-  }
+/* Garante que o cabeçalho do card de provas não tenha fundo nem borda */
+.card.shadow-sm .card-header {
+  background-color: transparent;
+  border-bottom: none;
+}
 
-  /* --- Estilos para Sidebar Recolhível (Desktop) --- */
-  #sidebar {
-    transition: all 0.4s ease-in-out;
-  }
-
-  #wrapper.sidebar-collapsed #sidebar {
-    margin-left: -16.25rem; /* -260px, mesma largura da sidebar */
-  }
+/* Altera a cor do título das provas para o vinho principal, como sugerido */
+.card.shadow-sm .card-title {
+  color: var(--cor-vinho-principal);
 }
