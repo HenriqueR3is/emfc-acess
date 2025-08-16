@@ -12,7 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css" />
-  
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -21,7 +20,8 @@
   <script src="firebase-config.js"></script>
 </head>
 <body>
-  <div id="sidebar-overlay"></div> <div class="d-flex" id="wrapper">
+  <div id="sidebar-overlay"></div>
+  
   <div class="d-flex" id="wrapper">
     <nav id="sidebar" class="d-flex flex-column p-3">
       <div class="sidebar-header text-center my-3">
@@ -49,112 +49,84 @@
       </div>
     </nav>
 
-<main id="main-content" class="p-4 flex-grow-1">
-  <header class="main-header d-flex align-items-center mb-4">
-    <button class="btn btn-toggle-sidebar me-3" id="sidebar-toggle">
-      <i class="fas fa-bars"></i>
-    </button>
-    <h1 id="page-title-header" class="page-title m-0">Início</h1>
-  </header>
-  
-  <div class="pages-container">
-    <div id="page-home" class="page-content">
-      </div>
-    
-    <div id="page-calendario" class="page-content" style="display: none;">
-      </div>
-
-    <div id="page-eventos" class="page-content" style="display: none;">
-      </div>
-
-    <div id="page-estagio" class="page-content" style="display: none;">
-      </div>
-  </div>
-</main>
-
-  </div>
-
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="custom-modal-header text-center p-4">
-        <i class="fas fa-user-shield fa-3x mb-3"></i>
-        <h4 class="modal-title">Acesso Restrito</h4>
-        <p class="mb-0">Área do Administrador</p>
-      </div>
-
-      <div class="modal-body p-4">
-        <form id="login-form">
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" required>
+    <main id="main-content" class="p-4 flex-grow-1">
+      <header class="main-header d-flex align-items-center mb-4">
+        <button class="btn btn-toggle-sidebar me-3" id="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 id="page-title-header" class="page-title m-0">Início</h1>
+      </header>
+      
+      <div class="pages-container">
+        <div id="page-home" class="page-content">
+          <div class="card admin-only mb-4">
+            <div class="card-header fw-bold"><i class="fas fa-bullhorn me-2"></i>Adicionar Novo Aviso</div>
+            <div class="card-body">
+              <input type="text" id="titulo-aviso" class="form-control mb-2" placeholder="Título do Aviso">
+              <textarea id="conteudo-aviso" class="form-control" rows="4" placeholder="Descrição completa..."></textarea>
+              <button id="add-aviso-btn" class="btn btn-primary w-100 mt-3">Publicar Aviso</button>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <input type="password" id="password" class="form-control" required>
+
+          <div class="card admin-only mb-4">
+            <div class="card-header fw-bold"><i class="fas fa-plus-circle me-2"></i>Adicionar Nova Avaliação</div>
+            <div class="card-body">
+              <input type="text" id="titulo-prova" class="form-control mb-2" placeholder="Título da Prova/Trabalho">
+              <input type="date" id="data-prova" class="form-control mb-2">
+              <textarea id="conteudo-prova" class="form-control" rows="3" placeholder="Conteúdo e detalhes..."></textarea>
+              <button id="add-prova-btn" class="btn btn-primary w-100 mt-3">Adicionar Avaliação</button>
+            </div>
           </div>
-        </form>
-      </div>
 
-      <div class="modal-footer border-0 p-3">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" id="login-btn" class="btn btn-primary">Entrar</button>
+          <h2 class="page-title mb-3">Mural de Avisos</h2>
+          <div id="lista-avisos" class="mb-5"></div>
+          
+          <hr>
+
+          <h2 class="page-title mt-5 mb-3">Próximas Provas e Trabalhos</h2>
+          <div id="lista-provas"></div>
+        </div>
+        
+        <div id="page-calendario" class="page-content" style="display: none;">
+          </div>
+
+        <div id="page-eventos" class="page-content" style="display: none;">
+          </div>
+
+        <div id="page-estagio" class="page-content" style="display: none;">
+          </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="custom-modal-header text-center p-4">
+          <i class="fas fa-user-shield fa-3x mb-3"></i>
+          <h4 class="modal-title">Acesso Restrito</h4>
+          <p class="mb-0">Área do Administrador</p>
+        </div>
+        <div class="modal-body p-4">
+          <form id="login-form">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Senha</label>
+              <input type="password" id="password" class="form-control" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0 p-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="login-btn" class="btn btn-primary">Entrar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<div id="page-home" class="page-content">
-  <div class="card admin-only mb-4">
-    <div class="card-header fw-bold">
-      <i class="fas fa-plus-circle me-2"></i>Adicionar Nova Avaliação
-    </div>
-    <div class="card-body">
-      <div class="mb-3">
-        <label for="titulo-prova" class="form-label">Título da Prova/Trabalho</label>
-        <input type="text" id="titulo-prova" class="form-control">
-      </div>
-      <div class="mb-3">
-        <label for="data-prova" class="form-label">Data de Entrega</label>
-        <input type="date" id="data-prova" class="form-control">
-      </div>
-      <div class="mb-3">
-        <label for="conteudo-prova" class="form-label">Conteúdo e Detalhes</label>
-        <textarea id="conteudo-prova" class="form-control" rows="3" placeholder="Ex: Capítulos 1 a 5 do livro, entregar em PDF..."></textarea>
-      </div>
-      <button id="add-prova-btn" class="btn btn-primary w-100">Adicionar</button>
-    </div>
-  </div>
-
-<div id="page-home" class="page-content">
-  <div class="card admin-only mb-4">
-    <div class="card-header fw-bold"><i class="fas fa-bullhorn me-2"></i>Adicionar Novo Aviso</div>
-    <div class="card-body">
-      <div class="mb-3">
-        <label for="titulo-aviso" class="form-label">Título do Aviso</label>
-        <input type="text" id="titulo-aviso" class="form-control">
-      </div>
-      <div class="mb-3">
-        <label for="conteudo-aviso" class="form-label">Descrição Completa</label>
-        <textarea id="conteudo-aviso" class="form-control" rows="4"></textarea>
-      </div>
-      <button id="add-aviso-btn" class="btn btn-primary w-100">Publicar Aviso</button>
-    </div>
-  </div>
-
-  <h2 class="page-title mb-3">Mural de Avisos</h2>
-  <div id="lista-avisos" class="mb-5"></div>
-  
-  <hr>
-
-  <h2 class="page-title mt-5 mb-3">Próximas Provas e Trabalhos</h2>
-  <div id="lista-provas"></div>
-</div>
-
-  <div id="lista-provas"></div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="script.js"></script>

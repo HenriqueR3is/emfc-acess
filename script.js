@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginModalEl = document.getElementById('loginModal');
   const loginModal = new bootstrap.Modal(loginModalEl);
 
-  // --- FUNÇÕES GLOBAIS (DENTRO DO ESCOPO) ---
+  // --- FUNÇÕES GLOBAIS (PARA SEREM CHAMADAS PELO HTML) ---
   window.deletarProva = function(id) {
     if (confirm("Tem certeza que deseja excluir esta avaliação?")) {
       db.collection("provas").doc(id).delete();
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- FUNÇÃO DE FEEDBACK (TOASTS) ---
   function showToast(message, type = 'success') {
     const toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) return; // Não quebra se o container não existir
+    if (!toastContainer) return;
     const toastId = 'toast-' + Date.now();
     const toastColorClass = type === 'success' ? 'text-bg-success' : 'text-bg-danger';
     const toastHtml = `
@@ -58,13 +58,38 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- LÓGICA DA INTERFACE (SIDEBAR E NAVEGAÇÃO) ---
-  function toggleSidebar() { /* ... código da sidebar sem alterações ... */ }
+  function toggleSidebar() {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      document.body.classList.toggle("sidebar-mobile-open");
+    } else {
+      wrapper.classList.toggle("sidebar-collapsed");
+    }
+  }
   sidebarToggleBtn.addEventListener("click", toggleSidebar);
   sidebarOverlay.addEventListener("click", toggleSidebar);
-  function navigateTo(pageId) { /* ... código de navegação sem alterações ... */ }
-  navLinks.forEach(link => { link.addEventListener("click", (e) => { e.preventDefault(); navigateTo(link.getAttribute("data-page")); }); });
-  navigateTo('home');
 
+  function navigateTo(pageId) {
+    pages.forEach(page => page.style.display = 'none');
+    const targetPage = document.getElementById(`page-${pageId}`);
+    if (targetPage) targetPage.style.display = 'block';
+    const activeLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+    if (activeLink) pageTitleHeader.textContent = activeLink.textContent.trim();
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.dataset.page === pageId) link.classList.add('active');
+    });
+    if (window.innerWidth <= 768) {
+      document.body.classList.remove("sidebar-mobile-open");
+    }
+  }
+  navLinks.forEach(link => { 
+    link.addEventListener("click", (e) => { 
+      e.preventDefault(); 
+      navigateTo(link.getAttribute("data-page")); 
+    }); 
+  });
+  
   // --- LÓGICA DE AUTENTICAÇÃO (LOGIN/LOGOUT) ---
   const loginBtn = document.getElementById("login-btn");
   loginBtn.addEventListener("click", () => {
@@ -100,52 +125,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const titulo = document.getElementById("titulo-prova").value;
     const data = document.getElementById("data-prova").value;
     const conteudo = document.getElementById("conteudo-prova").value;
-
     if (titulo && data) {
       db.collection("provas").add({
-        titulo: titulo,
-        data: data,
-        conteudo: conteudo,
+        titulo: titulo, data: data, conteudo: conteudo,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         document.getElementById("titulo-prova").value = "";
         document.getElementById("data-prova").value = "";
         document.getElementById("conteudo-prova").value = "";
-      }).catch(error => console.error("Erro ao adicionar: ", error));
-    } else {
-      alert("Por favor, preencha pelo menos o título e a data.");
-    }
+      });
+    } else { alert("Por favor, preencha pelo menos o título e a data."); }
   });
 
- db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {
+  db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {
     const listaProvas = document.getElementById("lista-provas");
+    if (!listaProvas) return;
     listaProvas.innerHTML = "";
     if (snapshot.empty) {
-      listaProvas.innerHTML = "<p class='text-center text-muted'>Nenhuma avaliação cadastrada no momento.</p>";
+      listaProvas.innerHTML = "<p class='text-center text-muted'>Nenhuma avaliação cadastrada.</p>";
       return;
     }
     snapshot.forEach(doc => {
       const prova = doc.data();
-      let dataFormatada = 'Data não definida';
+      let dataFormatada = 'Data inválida';
       if (prova.data) {
         const dataObj = new Date(prova.data + 'T00:00:00');
         if (!isNaN(dataObj.getTime())) {
           dataFormatada = dataObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-        } else {
-          dataFormatada = 'Data em formato inválido';
         }
       }
       const cardHtml = `
         <div class="card shadow-sm mb-3">
           <div class="card-header d-flex justify-content-between align-items-center bg-white">
-            <h5 class="card-title mb-0" style="color: var(--cor-vinho-principal);">${prova.titulo}</h5>
+            <h5 class="card-title mb-0">${prova.titulo}</h5>
             <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
               <button class="btn btn-sm btn-outline-danger" onclick="deletarProva('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
             </div>
           </div>
           <div class="card-body">
             <h6 class="card-subtitle mb-2 text-muted"><strong>Data:</strong> ${dataFormatada}</h6>
-            <p class="card-text">${(prova.conteudo || 'Sem conteúdo definido.').replace(/\n/g, '<br>')}</p>
+            <p class="card-text">${(prova.conteudo || 'Sem detalhes.').replace(/\n/g, '<br>')}</p>
           </div>
         </div>`;
       listaProvas.innerHTML += cardHtml;
@@ -155,32 +174,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- LÓGICA DO CRUD DE AVISOS ---
   const addAvisoBtn = document.getElementById("add-aviso-btn");
   addAvisoBtn.addEventListener("click", () => {
-  const titulo = document.getElementById("titulo-aviso").value;
-  const conteudo = document.getElementById("conteudo-aviso").value;
-
-  if (titulo && conteudo) {
-    db.collection("avisos").add({
-      titulo: titulo,
-      conteudo: conteudo,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById("titulo-aviso").value = "";
-      document.getElementById("conteudo-aviso").value = "";
-    });
-  } else {
-    alert("Por favor, preencha o título e o conteúdo do aviso.");
-  }
-});
+    const titulo = document.getElementById("titulo-aviso").value;
+    const conteudo = document.getElementById("conteudo-aviso").value;
+    if (titulo && conteudo) {
+      db.collection("avisos").add({
+        titulo: titulo, conteudo: conteudo,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById("titulo-aviso").value = "";
+        document.getElementById("conteudo-aviso").value = "";
+      });
+    } else { alert("Por favor, preencha o título e o conteúdo do aviso."); }
+  });
 
   db.collection("avisos").orderBy("createdAt", "desc").onSnapshot(snapshot => {
     const listaAvisos = document.getElementById("lista-avisos");
+    if (!listaAvisos) return;
     listaAvisos.innerHTML = "";
     if (snapshot.empty) {
       listaAvisos.innerHTML = "<p class='text-center text-muted'>Nenhum aviso publicado.</p>";
     }
     snapshot.forEach(doc => {
       const aviso = doc.data();
-      const dataAviso = aviso.createdAt ? aviso.createdAt.toDate().toLocaleDateString('pt-BR') : 'Data indisponível';
+      const dataAviso = aviso.createdAt ? aviso.createdAt.toDate().toLocaleDateString('pt-BR') : '';
       const cardHtml = `
         <div class="card card-aviso mb-3">
           <div class="card-body">
@@ -198,18 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
       listaAvisos.innerHTML += cardHtml;
     });
   });
-});
 
-    // Reavalia os controles de admin após renderizar
-    if (auth.currentUser) {
-      const adminElements = document.querySelectorAll(".admin-only");
-      adminElements.forEach(el => el.style.display = 'block');
-    }
-    
-    // --- CORREÇÃO APLICADA AQUI ---
-    // Após redesenhar os cards, verificamos se o usuário está logado
-    // e garantimos que os controles de admin nos novos cards fiquem visíveis.
-    if (auth.currentUser) {
-      const adminElements = document.querySelectorAll(".admin-only");
-      adminElements.forEach(el => el.style.display = 'block');
-    }
+  // --- INICIALIZAÇÃO DA PÁGINA ---
+  navigateTo('home');
+});
