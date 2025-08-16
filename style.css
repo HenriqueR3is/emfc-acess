@@ -245,3 +245,7 @@ hr {
 .card.shadow-sm .card-title {
   color: var(--cor-vinho-principal);
 }
+
+.card-title {
+  width: 75%;
+}
