@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarOverlay = document.getElementById("sidebar-overlay");
   const loginModalEl = document.getElementById('loginModal');
   const loginModal = new bootstrap.Modal(loginModalEl);
+  const listaMateriais = document.getElementById("lista-materiais");
 
   // --- FUNÇÕES GLOBAIS (PARA SEREM CHAMADAS PELO HTML) ---
   window.deletarProva = function(id) {
@@ -237,4 +238,121 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- INICIALIZAÇÃO DA PÁGINA ---
   navigateTo('home');
+
+  // ===============================================
+  // ===== LÓGICA DO CRUD DE MATERIAIS DE ESTUDO =====
+  // ===============================================
+  const addMaterialBtn = document.getElementById("add-material-btn");
+  const arquivoInput = document.getElementById("arquivo-material");
+  const progressBar = document.getElementById("upload-progress-bar");
+  const progressBarInner = progressBar.querySelector('.progress-bar');
+
+  // 1. UPLOAD E CRIAÇÃO
+  addMaterialBtn.addEventListener("click", () => {
+    const titulo = document.getElementById("titulo-material").value;
+    const descricao = document.getElementById("descricao-material").value;
+    const arquivo = arquivoInput.files[0];
+
+    if (!titulo || !arquivo) {
+      alert("Por favor, preencha o título e selecione um arquivo.");
+      return;
+    }
+
+    // Cria uma referência para o arquivo no Firebase Storage
+    const storageRef = firebase.storage().ref(`materiais/${Date.now()}_${arquivo.name}`);
+    // Inicia o upload
+    const task = storageRef.put(arquivo);
+
+    // Monitora o progresso do upload
+    task.on('state_changed',
+      (snapshot) => {
+        // Atualiza a barra de progresso
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        progressBar.style.display = 'block';
+        progressBarInner.style.width = progress + '%';
+        progressBarInner.textContent = Math.round(progress) + '%';
+      },
+      (error) => {
+        // Trata erros no upload
+        console.error("Erro no upload: ", error);
+        showToast("Falha no envio do arquivo.", "danger");
+        progressBar.style.display = 'none';
+      },
+      () => {
+        // Upload concluído com sucesso
+        task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          // Salva as informações do arquivo no Firestore
+          db.collection("materiais").add({
+            titulo: titulo,
+            descricao: descricao,
+            downloadURL: downloadURL,
+            fileName: arquivo.name,
+            storagePath: storageRef.fullPath, // Caminho para deletar depois
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          showToast("Material enviado com sucesso!");
+          // Limpa o formulário
+          document.getElementById("titulo-material").value = "";
+          document.getElementById("descricao-material").value = "";
+          arquivoInput.value = "";
+          progressBar.style.display = 'none';
+        });
+      }
+    );
+  });
+
+  // 2. LER E EXIBIR
+  db.collection("materiais").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+    if (!listaMateriais) return;
+    listaMateriais.innerHTML = "";
+    if (snapshot.empty) {
+      listaMateriais.innerHTML = "<p class='text-center text-muted'>Nenhum material de estudo disponível.</p>";
+    }
+    snapshot.forEach(doc => {
+      const material = doc.data();
+      const cardHtml = `
+        <div class="card shadow-sm mb-3">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">${material.titulo}</h5>
+              <p class="card-text mb-1">${material.descricao}</p>
+              <small class="text-muted">Arquivo: ${material.fileName}</small>
+            </div>
+            <div class="d-flex align-items-center">
+              <a href="${material.downloadURL}" target="_blank" class="btn btn-outline-success me-2">
+                <i class="fas fa-download me-1"></i>Baixar
+              </a>
+              <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
+                <button class="btn btn-sm btn-outline-danger" onclick="deletarMaterial('${doc.id}', '${material.storagePath}')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      listaMateriais.innerHTML += cardHtml;
+    });
+    // Reavalia a visibilidade dos botões de admin
+    if (auth.currentUser) {
+      document.querySelectorAll("#lista-materiais .admin-only").forEach(el => el.style.display = 'block');
+    }
+  });
+
+  // 3. DELETAR (Função Global)
+  window.deletarMaterial = function(docId, storagePath) {
+    if (!confirm("Isso irá apagar o arquivo permanentemente. Deseja continuar?")) return;
+
+    // 1. Deleta o arquivo do Storage
+    firebase.storage().ref(storagePath).delete().then(() => {
+      // 2. Se o arquivo foi deletado, deleta o registro do Firestore
+      db.collection("materiais").doc(docId).delete().then(() => {
+        showToast("Material deletado com sucesso.");
+      });
+    }).catch(error => {
+      console.error("Erro ao deletar arquivo: ", error);
+      showToast("Falha ao deletar o material.", "danger");
+    });
+  }
 });

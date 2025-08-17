@@ -19,6 +19,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="firebase-config.js"></script>
 </head>
 <body>
@@ -41,6 +42,9 @@
         </li>
         <li class="nav-item">
           <a href="#" class="nav-link" data-page="estagio"><i class="fas fa-briefcase fa-fw me-2"></i>Vagas de Estágio</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-page="materiais"><i class="fas fa-book-open fa-fw me-2"></i>Materiais de Estudo</a>
         </li>
       </ul>
       <hr>
@@ -97,6 +101,32 @@
 
         <div id="page-estagio" class="page-content" style="display: none;">
           </div>
+
+        <div id="page-materiais" class="page-content" style="display: none;">
+          <div class="card admin-only mb-4">
+            <div class="card-header fw-bold"><i class="fas fa-upload me-2"></i>Enviar Novo Material</div>
+            <div class="card-body">
+            <div class="mb-3">
+              <label for="titulo-material" class="form-label">Título do Material</label>
+              <input type="text" id="titulo-material" class="form-control" placeholder="Ex: Slides - Aula 1 de Constitucional">
+            </div>
+            <div class="mb-3">
+              <label for="descricao-material" class="form-label">Descrição</label>
+              <textarea id="descricao-material" class="form-control" rows="2" placeholder="Breve descrição sobre o arquivo"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="arquivo-material" class="form-label">Selecione o Arquivo</label>
+              <input type="file" id="arquivo-material" class="form-control">
+            </div>
+            <div class="progress" id="upload-progress-bar" style="display: none;">
+              <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+            </div>
+            <button id="add-material-btn" class="btn btn-outline-danger w-100 mt-3">Enviar Material</button>
+          </div>
+        </div>
+
+        <h2 class="page-title mb-3">Biblioteca da Turma</h2>
+        <div id="lista-materiais"></div>
       </div>
     </main>
   </div>

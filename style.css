@@ -249,3 +249,8 @@ hr {
 .card-title {
   width: 50%;
 }
+
+/* Alinha os itens no topo para os cards de materiais */
+#lista-materiais .card-body.d-flex {
+  align-items: flex-start !important;
+}
