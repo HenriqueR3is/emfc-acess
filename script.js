@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Ouvinte para a lista de PROVAS ---
   if(listaProvas) {
     listaProvas.addEventListener('click', (e) => {
+      if (!auth.currentUser) return;      
       const target = e.target.closest('button');
       if (!target) return;
       const cardHeader = target.closest('.card-header');
@@ -141,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Ouvinte para a lista de AVISOS ---
   if(listaAvisos) {
     listaAvisos.addEventListener('click', (e) => {
+      if (!auth.currentUser) return;
       const target = e.target.closest('button');
       if (!target) return;
       const cardBody = target.closest('.card-body');
@@ -171,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Ouvinte para a lista de MATERIAIS ---
   if(listaMateriais) {
     listaMateriais.addEventListener('click', (e) => {
+      if (!auth.currentUser) return;      
       const target = e.target.closest('button.btn-delete-material');
       if (!target) return;
 
