@@ -2,9 +2,9 @@
 
 <br />
 <div align="center">
-  <a href="#">
-       <font size="12">⚖️</font>
-  </a>
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="images/T1DireitoUEM-Logo.png.png" alt="Logo" width="80" height="80">
+  </a>
 
   <h3 align="center">Portal da Turma T1 - Direito UEM</h3>
 
@@ -66,7 +66,7 @@ Para rodar uma cópia deste projeto localmente, siga estes passos.
 
 1.  **Clone o repositório**
     ```sh
-    git clone LINK_DO_SEU_REPOSITORIO
+    git clone https://github.com/HenriqueR3is/uem-acess
     ```
 2.  **Configure o Firebase**
     * Crie um arquivo chamado `firebase-config.js` na raiz do projeto.
