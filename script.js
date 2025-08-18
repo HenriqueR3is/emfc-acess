@@ -11,8 +11,64 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarOverlay = document.getElementById("sidebar-overlay");
   const loginModalEl = document.getElementById('loginModal');
   const loginModal = new bootstrap.Modal(loginModalEl);
+  
+  const listaProvas = document.getElementById("lista-provas");
+  const listaAvisos = document.getElementById("lista-avisos");
   const listaMateriais = document.getElementById("lista-materiais");
 
+  // --- FUNÇÕES DE FEEDBACK E INTERFACE ---
+  function showToast(message, type = 'success') {
+    const toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) return;
+    const toastId = 'toast-' + Date.now();
+    const toastColorClass = type === 'success' ? 'text-bg-success' : 'text-bg-danger';
+    const toastHtml = `
+      <div id="${toastId}" class="toast align-items-center ${toastColorClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">${message}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>`;
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toastEl = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+  }
+
+  function toggleSidebar() {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      document.body.classList.toggle("sidebar-mobile-open");
+    } else {
+      wrapper.classList.toggle("sidebar-collapsed");
+    }
+  }
+
+  function navigateTo(pageId) {
+    pages.forEach(page => page.style.display = 'none');
+    const targetPage = document.getElementById(`page-${pageId}`);
+    if (targetPage) targetPage.style.display = 'block';
+    const activeLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+    if (activeLink) pageTitleHeader.textContent = activeLink.textContent.trim();
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.dataset.page === pageId) link.classList.add('active');
+    });
+    if (window.innerWidth <= 768) {
+      document.body.classList.remove("sidebar-mobile-open");
+    }
+  }
+
+  // --- LÓGICA DE EVENTOS DA INTERFACE (SIDEBAR E NAVEGAÇÃO) ---
+  sidebarToggleBtn.addEventListener("click", toggleSidebar);
+  sidebarOverlay.addEventListener("click", toggleSidebar);
+  navLinks.forEach(link => { 
+    link.addEventListener("click", (e) => { 
+      e.preventDefault(); 
+      navigateTo(link.getAttribute("data-page")); 
+    }); 
+  });
+  
   // --- FUNÇÕES GLOBAIS (PARA SEREM CHAMADAS PELO HTML) ---
   window.deletarProva = function(id) {
     if (confirm("Tem certeza que deseja excluir esta avaliação?")) {
@@ -57,58 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
-
-  // --- FUNÇÃO DE FEEDBACK (TOASTS) ---
-  function showToast(message, type = 'success') {
-    const toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) return;
-    const toastId = 'toast-' + Date.now();
-    const toastColorClass = type === 'success' ? 'text-bg-success' : 'text-bg-danger';
-    const toastHtml = `
-      <div id="${toastId}" class="toast align-items-center ${toastColorClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">${message}</div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      </div>`;
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    const toastEl = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-    toast.show();
-  }
-
-  // --- LÓGICA DA INTERFACE (SIDEBAR E NAVEGAÇÃO) ---
-  function toggleSidebar() {
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      document.body.classList.toggle("sidebar-mobile-open");
-    } else {
-      wrapper.classList.toggle("sidebar-collapsed");
-    }
-  }
-  sidebarToggleBtn.addEventListener("click", toggleSidebar);
-  sidebarOverlay.addEventListener("click", toggleSidebar);
-
-  function navigateTo(pageId) {
-    pages.forEach(page => page.style.display = 'none');
-    const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) targetPage.style.display = 'block';
-    const activeLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
-    if (activeLink) pageTitleHeader.textContent = activeLink.textContent.trim();
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.dataset.page === pageId) link.classList.add('active');
-    });
-    if (window.innerWidth <= 768) {
-      document.body.classList.remove("sidebar-mobile-open");
-    }
-  }
-  navLinks.forEach(link => { 
-    link.addEventListener("click", (e) => { 
-      e.preventDefault(); 
-      navigateTo(link.getAttribute("data-page")); 
-    }); 
-  });
   
   // --- LÓGICA DE AUTENTICAÇÃO (LOGIN/LOGOUT) ---
   const loginBtn = document.getElementById("login-btn");
@@ -157,8 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else { alert("Por favor, preencha pelo menos o título e a data."); }
   });
 
-  db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {
-    const listaProvas = document.getElementById("lista-provas");
+  db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {    
     if (!listaProvas) return;
     listaProvas.innerHTML = "";
     if (snapshot.empty) {
@@ -208,8 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else { alert("Por favor, preencha o título e o conteúdo do aviso."); }
   });
 
-  db.collection("avisos").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-    const listaAvisos = document.getElementById("lista-avisos");
+  db.collection("avisos").orderBy("createdAt", "desc").onSnapshot(snapshot => {    
     if (!listaAvisos) return;
     listaAvisos.innerHTML = "";
     if (snapshot.empty) {
