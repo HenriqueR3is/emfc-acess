@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/T1DireitoUEM-Logo.png.png" alt="Logo" width="80" height="80">
+    <img src="images/T1DireitoUEM-Logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Portal da Turma T1 - Direito UEM</h3>
