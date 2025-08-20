@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/HenriqueR3is/uem-acess">
     <img src="images/LogoUEM.png" alt="Logo" width="100%" height="100%">
   </a>
 
