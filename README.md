@@ -2,7 +2,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/HenriqueR3is/uem-acess">
+  <a href="https://github.com/HenriqueR3is/uem-access">
     <img src="images/LogoUEM.png" alt="Logo" width="100%" height="100%">
   </a>
 
@@ -14,7 +14,7 @@
     <a href="https://turmadireitouem.vercel.app"><strong>Acessar o Site »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/HenriqueR3is/uem-acess">Reportar um Bug</a>
+    <a href="https://github.com/HenriqueR3is/uem-access">Reportar um Bug</a>
   </p>
 </div>
 
@@ -66,7 +66,7 @@ Para rodar uma cópia deste projeto localmente, siga estes passos.
 
 1.  **Clone o repositório**
     ```sh
-    git clone https://github.com/HenriqueR3is/uem-acess
+    git clone https://github.com/HenriqueR3is/uem-access
     ```
 2.  **Configure o Firebase**
     * Crie um arquivo chamado `firebase-config.js` na raiz do projeto.
@@ -103,6 +103,6 @@ Para rodar uma cópia deste projeto localmente, siga estes passos.
 
 [Henrique Hiroshi K. Reis] - [henriquehkreis@gmail.com]
 
-Link do Projeto: [https://github.com/HenriqueR3is/uem-acess](https://github.com/HenriqueR3is/uem-acess)
+Link do Projeto: [https://github.com/HenriqueR3is/uem-access](https://github.com/HenriqueR3is/uem-access)
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
