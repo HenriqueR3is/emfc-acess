@@ -11,12 +11,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebarOverlay = document.getElementById("sidebar-overlay");
   const loginModalEl = document.getElementById('loginModal');
   const loginModal = new bootstrap.Modal(loginModalEl);
-  
-  const listaProvas = document.getElementById("lista-provas");
-  const listaAvisos = document.getElementById("lista-avisos");
   const listaMateriais = document.getElementById("lista-materiais");
 
-  // --- FUNÇÕES DE FEEDBACK E INTERFACE ---
+  // --- FUNÇÕES GLOBAIS (PARA SEREM CHAMADAS PELO HTML) ---
+  window.deletarProva = function(id) {
+    if (confirm("Tem certeza que deseja excluir esta avaliação?")) {
+      db.collection("provas").doc(id).delete();
+    }
+  }
+
+  window.editarProva = function(id, tituloAtual, dataAtual, conteudoAtual) {
+    const novoTitulo = prompt("Editar Título da Avaliação:", tituloAtual);
+    if (novoTitulo === null) return; // Usuário cancelou
+
+    const novaData = prompt("Editar Data (AAAA-MM-DD):", dataAtual);
+    if (novaData === null) return; // Usuário cancelou
+
+    const novoConteudo = prompt("Editar Conteúdo:", conteudoAtual);
+    if (novoConteudo === null) return; // Usuário cancelou
+
+    if (novoTitulo && novaData) {
+      db.collection("provas").doc(id).update({
+        titulo: novoTitulo,
+        data: novaData,
+        conteudo: novoConteudo
+      });
+    }
+  }
+
+  window.deletarAviso = function(id) {
+    if (confirm("Tem certeza que deseja apagar este aviso?")) {
+      db.collection("avisos").doc(id).delete();
+    }
+  }
+
+  window.editarAviso = function(id, tituloAtual, conteudoAtual) {
+    const novoTitulo = prompt("Editar Título:", tituloAtual);
+    if (novoTitulo === null) return;
+    const novoConteudo = prompt("Editar Conteúdo:", conteudoAtual);
+    if (novoConteudo === null) return;
+    if (novoTitulo && novoConteudo) {
+      db.collection("avisos").doc(id).update({
+        titulo: novoTitulo,
+        conteudo: novoConteudo
+      });
+    }
+  }
+
+  // --- FUNÇÃO DE FEEDBACK (TOASTS) ---
   function showToast(message, type = 'success') {
     const toastContainer = document.querySelector('.toast-container');
     if (!toastContainer) return;
@@ -35,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.show();
   }
 
+  // --- LÓGICA DA INTERFACE (SIDEBAR E NAVEGAÇÃO) ---
   function toggleSidebar() {
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
@@ -43,6 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
       wrapper.classList.toggle("sidebar-collapsed");
     }
   }
+  sidebarToggleBtn.addEventListener("click", toggleSidebar);
+  sidebarOverlay.addEventListener("click", toggleSidebar);
 
   function navigateTo(pageId) {
     pages.forEach(page => page.style.display = 'none');
@@ -58,10 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.remove("sidebar-mobile-open");
     }
   }
-
-  // --- LÓGICA DE EVENTOS DA INTERFACE (SIDEBAR E NAVEGAÇÃO) ---
-  sidebarToggleBtn.addEventListener("click", toggleSidebar);
-  sidebarOverlay.addEventListener("click", toggleSidebar);
   navLinks.forEach(link => { 
     link.addEventListener("click", (e) => { 
       e.preventDefault(); 
@@ -89,9 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const adminElements = document.querySelectorAll(".admin-only");
     const adminLoginArea = document.querySelector(".admin-login-area");
     const displayStyle = user ? 'block' : 'none';
-
     adminElements.forEach(el => el.style.display = displayStyle);
-
     if (user) {
       adminLoginArea.innerHTML = `<button class="btn btn-light w-100" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Sair</button>`;
       document.getElementById("logout-btn").addEventListener('click', () => auth.signOut());
@@ -100,313 +139,220 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // =============================================================
-  // ===== OUVINTES DE EVENTOS PARA OS CARDS (VERSÃO SEGURA) =====
-  // =============================================================
-
-  // --- Ouvinte para a lista de PROVAS ---
-  if(listaProvas) {
-    listaProvas.addEventListener('click', (e) => {
-      if (!auth.currentUser) return;      
-      const target = e.target.closest('button');
-      if (!target) return;
-      const cardHeader = target.closest('.card-header');
-      if (!cardHeader) return;
-
-      const id = cardHeader.dataset.id;
-      const titulo = cardHeader.dataset.titulo;
-      const data = cardHeader.dataset.data;
-      const conteudo = cardHeader.dataset.conteudo;
-
-      if (target.classList.contains('btn-delete-prova')) {
-        if (confirm("Tem certeza que deseja excluir esta avaliação?")) {
-          db.collection("provas").doc(id).delete();
-        }
-      }
-      if (target.classList.contains('btn-edit-prova')) {
-        const novoTitulo = prompt("Editar Título da Avaliação:", titulo);
-        if (novoTitulo === null) return;
-        const novaData = prompt("Editar Data (AAAA-MM-DD):", data);
-        if (novaData === null) return;
-        const novoConteudo = prompt("Editar Conteúdo:", conteudo);
-        if (novoConteudo === null) return;
-        if (novoTitulo && novaData) {
-          db.collection("provas").doc(id).update({
-            titulo: novoTitulo, data: novaData, conteudo: novoConteudo
-          });
-        }
-      }
-    });
-  }
-  
-  // --- Ouvinte para a lista de AVISOS ---
-  if(listaAvisos) {
-    listaAvisos.addEventListener('click', (e) => {
-      if (!auth.currentUser) return;
-      const target = e.target.closest('button');
-      if (!target) return;
-      const cardBody = target.closest('.card-body');
-      if(!cardBody) return;
-      const id = cardBody.dataset.id;
-      const titulo = cardBody.dataset.titulo;
-      const conteudo = cardBody.dataset.conteudo;
-      if (target.classList.contains('btn-delete-aviso')) {
-        if (confirm("Tem certeza que deseja apagar este aviso?")) {
-          db.collection("avisos").doc(id).delete();
-        }
-      }
-      if (target.classList.contains('btn-edit-aviso')) {
-        const novoTitulo = prompt("Editar Título:", titulo);
-        if (novoTitulo === null) return;
-        const novoConteudo = prompt("Editar Conteúdo:", conteudo);
-        if (novoConteudo === null) return;
-        if (novoTitulo && novoConteudo) {
-          db.collection("avisos").doc(id).update({
-            titulo: novoTitulo,
-            conteudo: novoConteudo
-          });
-        }
-      }
-    });
-  }
-
-  // --- Ouvinte para a lista de MATERIAIS ---
-  if(listaMateriais) {
-    listaMateriais.addEventListener('click', (e) => {
-      if (!auth.currentUser) return;      
-      const target = e.target.closest('button.btn-delete-material');
-      if (!target) return;
-
-      const docId = target.dataset.id;
-      const storagePath = target.dataset.path;
-
-      if (confirm("Isso irá apagar o arquivo permanentemente. Deseja continuar?")) {
-        firebase.storage().ref(storagePath).delete().then(() => {
-          db.collection("materiais").doc(docId).delete().then(() => {
-            showToast("Material deletado com sucesso.");
-          });
-        }).catch(error => {
-          console.error("Erro ao deletar arquivo: ", error);
-          showToast("Falha ao deletar o material.", "danger");
-        });
-      }
-    });
-  }
-
-
   // --- LÓGICA DO CRUD DE PROVAS/TRABALHOS ---
-  if(listaProvas) {
-    db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {
-      listaProvas.innerHTML = "";
-      if (snapshot.empty) {
-        listaProvas.innerHTML = "<p class='text-center text-muted'>Nenhuma avaliação cadastrada.</p>";
-        return;
-      }
-      snapshot.forEach(doc => {
-        const prova = doc.data();
-        let dataFormatada = 'Data inválida';
-        if (prova.data) {
-          const dataObj = new Date(prova.data + 'T00:00:00');
-          if (!isNaN(dataObj.getTime())) {
-            dataFormatada = dataObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-          }
-        }
-        const cardHtml = `
-          <div class="card shadow-sm mb-3">
-            <div class="card-header d-flex justify-content-between align-items-start" 
-                 data-id="${doc.id}"
-                 data-titulo="${(prova.titulo || '').replace(/"/g, '&quot;')}"
-                 data-data="${prova.data || ''}"
-                 data-conteudo="${(prova.conteudo || '').replace(/"/g, '&quot;')}">
-              <h5 class="card-title flex-grow-1">${prova.titulo}</h5>
-              <div class="admin-only d-flex" style="display: ${auth.currentUser ? 'flex' : 'none'};">
-                <button class="btn btn-sm btn-outline-primary me-2 btn-edit-prova"><i class="fas fa-pencil-alt"></i></button>
-                <button class="btn btn-sm btn-outline-danger btn-delete-prova"><i class="fas fa-trash-alt"></i></button>
-              </div>
-            </div>
-            <div class="card-body">
-              <h6 class="card-subtitle mb-2 text-muted"><strong>Data:</strong> ${dataFormatada}</h6>
-              <p class="card-text">${(prova.conteudo || 'Sem detalhes.').replace(/\n/g, '<br>')}</p>
-            </div>
-          </div>`;
-        listaProvas.innerHTML += cardHtml;
+  const addProvaBtn = document.getElementById("add-prova-btn");
+  addProvaBtn.addEventListener("click", () => {
+    const titulo = document.getElementById("titulo-prova").value;
+    const data = document.getElementById("data-prova").value;
+    const conteudo = document.getElementById("conteudo-prova").value;
+    if (titulo && data) {
+      db.collection("provas").add({
+        titulo: titulo, data: data, conteudo: conteudo,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById("titulo-prova").value = "";
+        document.getElementById("data-prova").value = "";
+        document.getElementById("conteudo-prova").value = "";
       });
+    } else { alert("Por favor, preencha pelo menos o título e a data."); }
+  });
+
+  db.collection("provas").orderBy("data", "asc").onSnapshot(snapshot => {
+    const listaProvas = document.getElementById("lista-provas");
+    if (!listaProvas) return;
+    listaProvas.innerHTML = "";
+    if (snapshot.empty) {
+      listaProvas.innerHTML = "<p class='text-center text-muted'>Nenhuma avaliação cadastrada.</p>";
+      return;
+    }
+    snapshot.forEach(doc => {
+      const prova = doc.data();
+      let dataFormatada = 'Data inválida';
+      if (prova.data) {
+        const dataObj = new Date(prova.data + 'T00:00:00');
+        if (!isNaN(dataObj.getTime())) {
+          dataFormatada = dataObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+        }
+      }
+      const cardHtml = `
+        <div class="card shadow-sm mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">${prova.titulo}</h5>
+            <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
+              <button class="btn btn-sm btn-outline-primary me-2" onclick="editarProva('${doc.id}', \`${prova.titulo}\`, \`${prova.data}\`, \`${prova.conteudo || ''}\`)"><i class="fas fa-pencil-alt"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deletarProva('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted"><strong>Data:</strong> ${dataFormatada}</h6>
+            <p class="card-text">${(prova.conteudo || 'Sem detalhes.').replace(/\n/g, '<br>')}</p>
+          </div>
+        </div>`;
+      listaProvas.innerHTML += cardHtml;
     });
-  }
+  });
 
   // --- LÓGICA DO CRUD DE AVISOS ---
-  if(listaAvisos) {
-    db.collection("avisos").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-      listaAvisos.innerHTML = "";
-      if (snapshot.empty) {
-        listaAvisos.innerHTML = "<p class='text-center text-muted'>Nenhum aviso publicado.</p>";
-      }
-      snapshot.forEach(doc => {
-        const aviso = doc.data();
-        const dataAviso = aviso.createdAt ? aviso.createdAt.toDate().toLocaleDateString('pt-BR') : '';
-        const cardHtml = `
-          <div class="card card-aviso mb-3">
-            <div class="card-body"
-                 data-id="${doc.id}"
-                 data-titulo="${(aviso.titulo || '').replace(/"/g, '&quot;')}"
-                 data-conteudo="${(aviso.conteudo || '').replace(/"/g, '&quot;')}">
-              <div class="d-flex justify-content-between align-items-start">
-                <h5 class="card-title flex-grow-1">${aviso.titulo}</h5>
-                <div class="admin-only d-flex" style="display: ${auth.currentUser ? 'flex' : 'none'};">
-                  <button class="btn btn-sm btn-outline-primary me-2 btn-edit-aviso"><i class="fas fa-pencil-alt"></i></button>
-                  <button class="btn btn-sm btn-outline-danger btn-delete-aviso"><i class="fas fa-trash-alt"></i></button>
-                </div>
-              </div>
-              <p class="card-text">${(aviso.conteudo || '').replace(/\n/g, '<br>')}</p>
-              <small class="text-muted">Publicado em: ${dataAviso}</small>
-            </div>
-          </div>`;
-        listaAvisos.innerHTML += cardHtml;
-      });
-    });
-  }
-
-  // --- LÓGICA CRUD DE MATERIAIS ---
-  if(listaMateriais) {
-    db.collection("materiais").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-      listaMateriais.innerHTML = "";
-      if (snapshot.empty) {
-        listaMateriais.innerHTML = "<p class='text-center text-muted'>Nenhum material de estudo disponível.</p>";
-      }
-      snapshot.forEach(doc => {
-        const material = doc.data();
-        const cardHtml = `
-          <div class="card shadow-sm mb-3">
-            <div class="card-body d-flex justify-content-between align-items-start">
-              <div>
-                <h5 class="card-title">${material.titulo}</h5>
-                <p class="card-text mb-1">${(material.descricao || '').replace(/"/g, '&quot;')}</p>
-                <small class="text-muted">Arquivo: ${material.fileName}</small>
-              </div>
-              <div class="d-flex align-items-center">
-                <a href="${material.downloadURL}" target="_blank" class="btn btn-outline-success me-2">
-                  <i class="fas fa-download me-1"></i>Baixar
-                </a>
-                <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
-                  <button class="btn btn-sm btn-outline-danger btn-delete-material" 
-                          data-id="${doc.id}" 
-                          data-path="${material.storagePath}">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>`;
-        listaMateriais.innerHTML += cardHtml;
-      });
-      // Reavalia a visibilidade dos botões de admin
-      if (auth.currentUser) {
-        document.querySelectorAll("#lista-materiais .admin-only").forEach(el => el.style.display = 'block');
-      }
-    });
-  }
-
-  // --- LÓGICA PARA ADICIONAR CONTEÚDO ---
-
-  // --- ADICIONAR PROVA ---
-  const addProvaBtn = document.getElementById("add-prova-btn");
-  if(addProvaBtn) {
-    addProvaBtn.addEventListener("click", () => {
-      const titulo = document.getElementById("titulo-prova").value;
-      const data = document.getElementById("data-prova").value;
-      const conteudo = document.getElementById("conteudo-prova").value;
-      if (titulo && data) {
-        db.collection("provas").add({
-          titulo: titulo, data: data, conteudo: conteudo,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          document.getElementById("titulo-prova").value = "";
-          document.getElementById("data-prova").value = "";
-          document.getElementById("conteudo-prova").value = "";
-          showToast("Avaliação adicionada com sucesso!");
-        });
-      } else { alert("Por favor, preencha pelo menos o título e a data."); }
-    });
-  }
-
-  // --- ADICIONAR AVISO ---
   const addAvisoBtn = document.getElementById("add-aviso-btn");
-  if(addAvisoBtn) {
-    addAvisoBtn.addEventListener("click", () => {
-      const titulo = document.getElementById("titulo-aviso").value;
-      const conteudo = document.getElementById("conteudo-aviso").value;
-      if (titulo && conteudo) {
-        db.collection("avisos").add({
-          titulo: titulo, conteudo: conteudo,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          document.getElementById("titulo-aviso").value = "";
-          document.getElementById("conteudo-aviso").value = "";
-          showToast("Aviso publicado com sucesso!");
-        });
-      } else { alert("Por favor, preencha o título e o conteúdo do aviso."); }
+  addAvisoBtn.addEventListener("click", () => {
+    const titulo = document.getElementById("titulo-aviso").value;
+    const conteudo = document.getElementById("conteudo-aviso").value;
+    if (titulo && conteudo) {
+      db.collection("avisos").add({
+        titulo: titulo, conteudo: conteudo,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById("titulo-aviso").value = "";
+        document.getElementById("conteudo-aviso").value = "";
+      });
+    } else { alert("Por favor, preencha o título e o conteúdo do aviso."); }
+  });
+
+  db.collection("avisos").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+    const listaAvisos = document.getElementById("lista-avisos");
+    if (!listaAvisos) return;
+    listaAvisos.innerHTML = "";
+    if (snapshot.empty) {
+      listaAvisos.innerHTML = "<p class='text-center text-muted'>Nenhum aviso publicado.</p>";
+    }
+    snapshot.forEach(doc => {
+      const aviso = doc.data();
+      const dataAviso = aviso.createdAt ? aviso.createdAt.toDate().toLocaleDateString('pt-BR') : '';
+      const cardHtml = `
+        <div class="card card-aviso mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h5 class="card-title">${aviso.titulo}</h5>
+              <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="editarAviso('${doc.id}', \`${aviso.titulo}\`, \`${aviso.conteudo || ''}\`)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deletarAviso('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
+              </div>
+            </div>
+            <p class="card-text">${(aviso.conteudo || '').replace(/\n/g, '<br>')}</p>
+            <small class="text-muted">Publicado em: ${dataAviso}</small>
+          </div>
+        </div>`;
+      listaAvisos.innerHTML += cardHtml;
     });
-  }
-
-  // --- ADICIONAR MATERIAL ---
-  const addMaterialBtn = document.getElementById("add-material-btn");
-  if(addMaterialBtn) {
-    const arquivoInput = document.getElementById("arquivo-material");
-    const progressBar = document.getElementById("upload-progress-bar");
-    const progressBarInner = progressBar.querySelector('.progress-bar');
-
-    addMaterialBtn.addEventListener("click", () => {
-      const titulo = document.getElementById("titulo-material").value;
-      const descricao = document.getElementById("descricao-material").value;
-      const arquivo = arquivoInput.files[0];
-
-      if (!titulo || !arquivo) {
-        alert("Por favor, preencha o título e selecione um arquivo.");
-        return;
-      }
-
-      // Cria uma referência para o arquivo no Firebase Storage
-      const storageRef = firebase.storage().ref(`materiais/${Date.now()}_${arquivo.name}`);
-      // Inicia o upload
-      const task = storageRef.put(arquivo);
-
-      // Monitora o progresso do upload
-      task.on('state_changed',
-        (snapshot) => {
-          // Atualiza a barra de progresso
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          progressBar.style.display = 'block';
-          progressBarInner.style.width = progress + '%';
-          progressBarInner.textContent = Math.round(progress) + '%';
-        },
-        (error) => {
-          console.error("Erro no upload: ", error);
-          showToast("Falha no envio do arquivo.", "danger");
-          progressBar.style.display = 'none';
-        },
-        () => {
-          // Upload concluído com sucesso
-          task.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            db.collection("materiais").add({
-              titulo: titulo,
-              descricao: descricao,
-              downloadURL: downloadURL,
-              fileName: arquivo.name,
-              storagePath: storageRef.fullPath,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast("Material enviado com sucesso!");
-            // Limpa o formulário
-            document.getElementById("titulo-material").value = "";
-            document.getElementById("descricao-material").value = "";
-            arquivoInput.value = "";
-            progressBar.style.display = 'none';
-          });
-        }
-      );
-    });
-  }
+  });
 
   // --- INICIALIZAÇÃO DA PÁGINA ---
   navigateTo('home');
+
+  // ===============================================
+  // ===== LÓGICA DO CRUD DE MATERIAIS DE ESTUDO =====
+  // ===============================================
+  const addMaterialBtn = document.getElementById("add-material-btn");
+  const arquivoInput = document.getElementById("arquivo-material");
+  const progressBar = document.getElementById("upload-progress-bar");
+  const progressBarInner = progressBar.querySelector('.progress-bar');
+
+  // 1. UPLOAD E CRIAÇÃO
+  addMaterialBtn.addEventListener("click", () => {
+    const titulo = document.getElementById("titulo-material").value;
+    const descricao = document.getElementById("descricao-material").value;
+    const arquivo = arquivoInput.files[0];
+
+    if (!titulo || !arquivo) {
+      alert("Por favor, preencha o título e selecione um arquivo.");
+      return;
+    }
+
+    // Cria uma referência para o arquivo no Firebase Storage
+    const storageRef = firebase.storage().ref(`materiais/${Date.now()}_${arquivo.name}`);
+    // Inicia o upload
+    const task = storageRef.put(arquivo);
+
+    // Monitora o progresso do upload
+    task.on('state_changed',
+      (snapshot) => {
+        // Atualiza a barra de progresso
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        progressBar.style.display = 'block';
+        progressBarInner.style.width = progress + '%';
+        progressBarInner.textContent = Math.round(progress) + '%';
+      },
+      (error) => {
+        // Trata erros no upload
+        console.error("Erro no upload: ", error);
+        showToast("Falha no envio do arquivo.", "danger");
+        progressBar.style.display = 'none';
+      },
+      () => {
+        // Upload concluído com sucesso
+        task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          // Salva as informações do arquivo no Firestore
+          db.collection("materiais").add({
+            titulo: titulo,
+            descricao: descricao,
+            downloadURL: downloadURL,
+            fileName: arquivo.name,
+            storagePath: storageRef.fullPath, // Caminho para deletar depois
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          showToast("Material enviado com sucesso!");
+          // Limpa o formulário
+          document.getElementById("titulo-material").value = "";
+          document.getElementById("descricao-material").value = "";
+          arquivoInput.value = "";
+          progressBar.style.display = 'none';
+        });
+      }
+    );
+  });
+
+  // 2. LER E EXIBIR
+  db.collection("materiais").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+    if (!listaMateriais) return;
+    listaMateriais.innerHTML = "";
+    if (snapshot.empty) {
+      listaMateriais.innerHTML = "<p class='text-center text-muted'>Nenhum material de estudo disponível.</p>";
+    }
+    snapshot.forEach(doc => {
+      const material = doc.data();
+      const cardHtml = `
+        <div class="card shadow-sm mb-3">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">${material.titulo}</h5>
+              <p class="card-text mb-1">${material.descricao}</p>
+              <small class="text-muted">Arquivo: ${material.fileName}</small>
+            </div>
+            <div class="d-flex align-items-center">
+              <a href="${material.downloadURL}" target="_blank" class="btn btn-outline-success me-2">
+                <i class="fas fa-download me-1"></i>Baixar
+              </a>
+              <div class="admin-only" style="display: ${auth.currentUser ? 'block' : 'none'};">
+                <button class="btn btn-sm btn-outline-danger" onclick="deletarMaterial('${doc.id}', '${material.storagePath}')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      listaMateriais.innerHTML += cardHtml;
+    });
+    // Reavalia a visibilidade dos botões de admin
+    if (auth.currentUser) {
+      document.querySelectorAll("#lista-materiais .admin-only").forEach(el => el.style.display = 'block');
+    }
+  });
+
+  // 3. DELETAR (Função Global)
+  window.deletarMaterial = function(docId, storagePath) {
+    if (!confirm("Isso irá apagar o arquivo permanentemente. Deseja continuar?")) return;
+
+    // 1. Deleta o arquivo do Storage
+    firebase.storage().ref(storagePath).delete().then(() => {
+      // 2. Se o arquivo foi deletado, deleta o registro do Firestore
+      db.collection("materiais").doc(docId).delete().then(() => {
+        showToast("Material deletado com sucesso.");
+      });
+    }).catch(error => {
+      console.error("Erro ao deletar arquivo: ", error);
+      showToast("Falha ao deletar o material.", "danger");
+    });
+  }
 });
